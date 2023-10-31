@@ -1,0 +1,585 @@
+#include<iostream>
+
+#define Zadanie2
+
+/* Zmieniając ostatnią literę w poniższej instrukcji na D (dodatkowe), lub P (podstawowe)
+*  wybierasz aktywne zadanie.
+*
+*  UWAGA: jeśli rozwiązanie zadań wymaga podziału programu na pliki to dodaj je wszystkie do
+*  projektu, ale przy każdym zadaniu "includuj" tylko te, które jego dotyczą.
+*  Poniższe bloki dotyczą zadań z zajeć.
+*/
+
+
+#ifdef Zadanie1
+
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Punkt
+{
+    double m_x;
+    double m_y;
+
+public:
+    Punkt() : m_x(0.0), m_y(0.0) {} // Konstruktor domyślny
+
+    void setXY(double x, double y)
+    {
+        m_x = x;
+        m_y = y;
+    }
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+    Punkt(double x, double y)
+        : m_x(x), m_y(y)
+    {}
+};
+
+class Kwadrat
+{
+    Punkt m_lewy_dolny, m_prawy_gorny;
+
+public:
+    void setRogi(Punkt ld, Punkt pg)
+    {
+        m_lewy_dolny = ld;
+        m_prawy_gorny = pg;
+    }
+    Punkt getLewyDolny() const { return m_lewy_dolny; }
+    Punkt getPrawyGorny() const { return m_prawy_gorny; }
+    Kwadrat(Punkt ld, Punkt pg)
+        : m_lewy_dolny(ld), m_prawy_gorny(pg)
+    {}
+
+    // Konstruktor konwersji formalnej
+    Kwadrat(const Punkt& punkt)
+    {
+        double dx = -punkt.getX();
+        double dy = -punkt.getY();
+
+        Punkt lewyDol(punkt.getX() + dx, punkt.getY() + dy);
+        Punkt prawaGora(punkt.getX() - dx, punkt.getY() - dy);
+
+        m_lewy_dolny = lewyDol;
+        m_prawy_gorny = prawaGora;
+    }
+};
+
+
+void test1()
+{
+    Punkt punktZrodlowy(2.0, 4.0);
+    Kwadrat nowaWersjaK = punktZrodlowy;
+    double lx, ly, px, py;
+
+    lx = nowaWersjaK.getLewyDolny().getX();
+    ly = nowaWersjaK.getLewyDolny().getY();
+    px = nowaWersjaK.getPrawyGorny().getX();
+    py = nowaWersjaK.getPrawyGorny().getY();
+
+    try
+    {
+        if (lx == 0 && ly == 0 && px == 4 && py == 8)
+        {
+            cerr << "OK\n";
+        }
+        else
+        {
+            cerr << "FAIL\n";
+        }
+    }
+    catch (...)
+    {
+        cerr << "INTERUPTED \n";
+    }
+}
+
+void test2()
+{
+    Punkt punktZrodlowy(1.0, 2.0);
+    Kwadrat nowaWersjaK = punktZrodlowy;
+    double lx, ly, px, py;
+
+    lx = nowaWersjaK.getLewyDolny().getX();
+    ly = nowaWersjaK.getLewyDolny().getY();
+    px = nowaWersjaK.getPrawyGorny().getX();
+    py = nowaWersjaK.getPrawyGorny().getY();
+
+    try
+    {
+        if (lx == 0 && ly == 0 && px == 2 && py == 4)
+        {
+            cerr << "OK\n";
+        }
+        else
+        {
+            cerr << "FAIL\n";
+        }
+    }
+    catch (...)
+    {
+        cerr << "INTERUPTED \n";
+    }
+}
+
+int main()
+{
+    Punkt punktZrodlowy(2.0, 4.0);
+    Kwadrat nowaWersjaK = punktZrodlowy; // Użyj konwersji formalnej
+
+
+    try
+    {
+        cout << "Kwadrat: Lewy Dolny: (" << nowaWersjaK.getLewyDolny().getX() << ", " << nowaWersjaK.getLewyDolny().getY() << ")";
+        cout << " Prawy Gorny: (" << nowaWersjaK.getPrawyGorny().getX() << ", " << nowaWersjaK.getPrawyGorny().getY() << ")"<<endl;
+    }
+    catch (...)
+    {
+        cerr << "INTERUPTED \n";
+    }
+   
+
+    cout << "TESTY\n";
+
+       test1();
+       test2();
+
+    return 0;
+}
+
+
+#endif
+
+
+#ifdef Zadanie2
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+class Punkt;
+
+class wektor
+{
+    double m_dx;
+    double m_dy;
+
+public:
+    void setDXY(double dx, double dy)
+    {
+        m_dx = dx;
+        m_dy = dy;
+    }
+    double getDX() const { return m_dx; }
+    double getDY() const { return m_dy; }
+    double dlugosc() const { return sqrt(m_dx * m_dx + m_dy * m_dy); }
+    wektor(double dx, double dy)
+        : m_dx(dx), m_dy(dy)
+    {}
+
+    // wektor ---> punkt (nieformalna)
+    Punkt naPunkt() const;
+};
+
+class Punkt
+{
+    double m_x;
+    double m_y;
+
+public:
+    void setXY(double x, double y)
+    {
+        m_x = x;
+        m_y = y;
+    }
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+    Punkt(double x, double y)
+
+        : m_x(x), m_y(y)
+    {}
+
+    // z punkt na wektor (nieformalna)
+    wektor naWektor() const;
+    void przesunPunkt(const wektor& wektor, double n = 1.0);
+};
+
+// Definicje konwersji
+Punkt wektor::naPunkt() const
+{
+    return Punkt(m_dx, m_dy);
+}
+
+wektor Punkt::naWektor() const
+{
+    return wektor(m_x, m_y);
+}
+
+// Przesuwa punkt o podana wielokrotnosc wektora.
+// Argument "n" (opcjonalny) okresla, ile razy wielokrotnosc wektora zostanie zastosowana.
+
+void Punkt::przesunPunkt(const wektor& wektor, double n)
+{
+    m_x += n * wektor.getDX();
+    m_y += n * wektor.getDY();
+}
+
+
+void test1()
+{
+    wektor wektor(2.0, 3.0);
+    Punkt punkt(0.0, 0.0);
+    Punkt wyn = wektor.naPunkt();
+   // double wyn, wynn, pkt, pktt;
+    punkt.przesunPunkt(wektor, 3.0);
+
+    try
+    {
+        if (wyn.getX() == 2 && wyn.getY()==3)
+        {
+            if (punkt.getX() == 6.0 && punkt.getY() == 9.0)
+            {
+                cerr << "OK\n";
+            }
+        }
+        else
+        {
+            cerr << "FAIL\n";
+        }
+    }
+    catch (...)
+    {
+        cerr << "INTERUPTED \n";
+    }
+}
+
+
+
+int main()
+{
+    wektor wektor(2.0, 3.0);
+    Punkt punkt(0.0, 0.0);
+
+    Punkt wyn = wektor.naPunkt();
+    cout << "Konwersja wektor na punkt: (" << wyn.getX() << ", " << wyn.getY() << ")"<<endl;
+
+    punkt.przesunPunkt(wektor, 3.0); // przesuniecie o dlugosc wektora * 3
+   cout << "przesuniety punkt: (" << punkt.getX() << ", " << punkt.getY() << ")"<<endl;
+
+   cout << "TESTY\n";
+
+   test1();
+  
+
+    return 0;
+}
+
+
+#endif
+
+#ifdef Zadanie3
+#include <iostream>
+#include <cmath>
+using namespace std;
+class Punkt
+{
+    double m_x;
+    double m_y;
+
+public:
+    // Dodany konstruktor domyślny
+    Punkt() : m_x(0.0), m_y(0.0) {}
+
+    void setXY(double x, double y)
+    {
+        m_x = x;
+        m_y = y;
+    }
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+    Punkt(double x, double y)
+        : m_x(x), m_y(y)
+    {}
+};
+
+class Kwadrat
+{
+    Punkt m_lewy_dolny, m_prawy_gorny;
+
+public:
+    void setRogi(Punkt ld, Punkt pg)
+    {
+        m_lewy_dolny = ld;
+        m_prawy_gorny = pg;
+    }
+    Punkt getLewyDolny() const { return m_lewy_dolny; }
+    Punkt getPrawyGorny() const { return m_prawy_gorny; }
+    Kwadrat(Punkt ld, Punkt pg)
+        : m_lewy_dolny(ld), m_prawy_gorny(pg)
+    {}
+
+    // Konstruktor konwersji
+    Kwadrat(const Punkt& punkt)
+    {
+        double dx = -punkt.getX();
+        double dy = -punkt.getY();
+
+        Punkt lewyDol(punkt.getX() + dx, punkt.getY() + dy);
+        Punkt prawaGora(punkt.getX() - dx, punkt.getY() - dy);
+
+        m_lewy_dolny = lewyDol;
+        m_prawy_gorny = prawaGora;
+    }
+
+    double getPolePowierzchni() const
+    {
+        double a = fabs(m_prawy_gorny.getX() - m_lewy_dolny.getX());
+        return a * a;
+    }
+};
+
+bool operator==(const Kwadrat& kwadrat1, const Kwadrat& kwadrat2)
+{
+    double epsilon = 0.001;
+    return fabs(kwadrat1.getPolePowierzchni() - kwadrat2.getPolePowierzchni()) < epsilon;
+}
+
+int main()
+{
+    Punkt punkty(2.0, 3.0);
+    Kwadrat nowaWersjaK = punkty;
+
+    Kwadrat kwadrat1({ 2.0, 2.0 }, { 5.0, 5.0 });
+    Kwadrat kwadrat2({ 3.0, 3.0 }, { 6.0, 6.0 });
+
+    if (kwadrat1 == kwadrat2)
+    {
+        cout << "takie samo pole" << endl;
+    }
+    else
+    {
+        cout << "rozne pole" << endl;
+    }
+
+    return 0;
+}
+
+#endif
+
+#ifdef Zadanie4
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+class Wektor
+{
+    double m_dx;
+    double m_dy;
+
+public:
+    Wektor(double dx, double dy)
+        : m_dx(dx), m_dy(dy)
+    {}
+
+    double getDX() const { return m_dx; }
+    double getDY() const { return m_dy; }
+};
+
+class Punkt
+{
+    double m_x;
+    double m_y;
+
+public:
+    Punkt(double x, double y)
+        : m_x(x), m_y(y)
+    {}
+
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+
+    Punkt operator+(const Wektor& wektor) const
+    {
+        double newX = m_x + wektor.getDX();
+        double newY = m_y + wektor.getDY();
+        return Punkt(newX, newY);
+    }
+};
+
+int main()
+{
+    Wektor wektor(2.0, 4.0);
+    Punkt punkt(1.0, 2.0);
+
+    Punkt przesunietyPunkt = punkt + wektor;
+
+    cout << "Nowy punkt: (" << przesunietyPunkt.getX() << ", " << przesunietyPunkt.getY() << ")\n";
+
+    return 0;
+}
+
+
+#endif
+
+
+#ifdef Zadanie5
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Punkt
+{
+    double m_x, m_y;
+
+public:
+    Punkt(double x, double y) : m_x(x), m_y(y) {}
+
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+};
+
+class Wektor
+{
+    double m_dx, m_dy;
+
+public:
+    Wektor(double dx, double dy) : m_dx(dx), m_dy(dy) {}
+
+    double getDX() const { return m_dx; }
+    double getDY() const { return m_dy; }
+
+    double dlugosc() const { return sqrt(m_dx * m_dx + m_dy * m_dy); }
+};
+
+class Kwadrat
+{
+    Punkt m_lewy_dolny, m_prawy_gorny;
+
+public:
+    void setRogi(Punkt ld, Punkt pg)
+    {
+        m_lewy_dolny = ld;
+        m_prawy_gorny = pg;
+    }
+
+    Punkt getLewyDolny() const { return m_lewy_dolny; }
+    Punkt getPrawyGorny() const { return m_prawy_gorny; }
+
+    Kwadrat(Punkt ld, Punkt pg) : m_lewy_dolny(ld), m_prawy_gorny(pg) {}
+
+    Wektor DoWektor() const
+    {
+        Punkt ld = getLewyDolny();
+        Punkt pg = getPrawyGorny();
+
+        double dx = pg.getX() - ld.getX();
+        double dy = pg.getY() - ld.getY();
+
+        return Wektor(dx, dy);
+    }
+};
+
+int main()
+{
+    Kwadrat mojKwadrat(Punkt(1, 0), Punkt(2, 2));
+
+    Wektor mojWektor = mojKwadrat.DoWektor();
+
+    cout << "wektor po x = " << mojWektor.getDX() << " po y = " << mojWektor.getDY();
+
+    return 0;
+}
+#endif
+
+
+#ifdef Zadanie6
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Punkt
+{
+    double m_x, m_y;
+
+public:
+    Punkt(double x, double y) : m_x(x), m_y(y) {}
+
+    double getX() const { return m_x; }
+    double getY() const { return m_y; }
+};
+
+class Wektor
+{
+    double m_dx, m_dy;
+
+public:
+    Wektor(double dx, double dy) : m_dx(dx), m_dy(dy) {}
+
+    double getDX() const { return m_dx; }
+    double getDY() const { return m_dy; }
+
+    double dlugosc() const { return sqrt(m_dx * m_dx + m_dy * m_dy); }
+
+    // konwersja - metoda statyczna w kl. wektor bo wynikiem jest wektor jednostkowy
+    static Wektor KonwertujNaWektorJednostkowy(const Punkt& punkt1, const Punkt& punkt2)
+    {
+        double dx = punkt2.getX() - punkt1.getX();
+        double dy = punkt2.getY() - punkt1.getY();
+
+        double dlugosc = sqrt(dx * dx + dy * dy);
+
+        if (dlugosc != 0.0)
+        {
+            dx /= dlugosc;
+            dy /= dlugosc;
+        }
+
+        return Wektor(dx, dy);
+    }
+};
+
+int main()
+{
+    Punkt punkt1(1, 1);
+    Punkt punkt2(3, 4);
+
+    Wektor wektorJednostkowy = Wektor::KonwertujNaWektorJednostkowy(punkt1, punkt2);
+
+    cout << "wektor jednostkowy po x: " << wektorJednostkowy.getDX() << ", po y = " << wektorJednostkowy.getDY();
+
+    return 0;
+}
+
+
+#endif
+
+
+
+
+
+#ifdef Blok1
+
+// TU UMIEŚĆ KOD ROZWIAZANIA ZADANIA Z BLOKU 1
+
+#endif
+
+#ifdef Blok2
+
+// TU UMIEŚĆ KOD ROZWIAZANIA ZADANIA Z BLOKU 2
+
+#endif
+
+#ifdef Blok3
+
+// TU UMIEŚĆ KOD ROZWIAZANIA ZADANIA Z BLOKU 3
+
+#endif
+
+#ifdef Blok4
+
+// TU UMIEŚĆ KOD ROZWIAZANIA ZADANIA Z BLOKU 4
+
+#endif
